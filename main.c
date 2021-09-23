@@ -54,6 +54,9 @@ int main()
       flag = (~flag) & 0x9C;
       GPIOD_BSRR = flag;
     }
+
+    for(int i = 0; i < 750000; i++)
+      __asm volatile("NOP");
   }
   
 
