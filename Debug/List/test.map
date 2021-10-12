@@ -1,0 +1,279 @@
+###############################################################################
+#
+# IAR ELF Linker V8.22.1.15669/W32 for ARM                08/Oct/2021  21:49:50
+# Copyright 2007-2018 IAR Systems AB.
+#
+#    Output file  =  C:\Users\pnu3\Desktop\JoyStick\Debug\Exe\test.out
+#    Map file     =  C:\Users\pnu3\Desktop\JoyStick\Debug\List\test.map
+#    Command line =  
+#        -f C:\Users\pnu3\AppData\Local\Temp\EW2846.tmp
+#        (C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\core_cm3.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\main.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\misc.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\startup_stm32f10x_cl.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_adc.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_bkp.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_can.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_cec.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_crc.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_dac.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_dbgmcu.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_dma.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_exti.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_flash.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_fsmc.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_gpio.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_i2c.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_it.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_iwdg.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_pwr.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_rcc.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_rtc.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_sdio.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_spi.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_tim.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_usart.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\stm32f10x_wwdg.o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Obj\system_stm32f10x.o -o
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\Exe\test.out --map
+#        C:\Users\pnu3\Desktop\JoyStick\Debug\List\test.map --log
+#        libraries,initialization,modules,redirects,sections,veneers,unused_fragments,call_graph
+#        --log_file C:\Users\pnu3\Desktop\JoyStick\Debug\List\test.log --config
+#        "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        8.0\arm\config\linker\ST\stm32f107xC.icf" --semihosting --entry
+#        __iar_program_start --vfe --text_out locale)
+#
+###############################################################################
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+CppFlavor       = *
+__SystemLibrary = DLib
+__dlib_version  = 6
+
+
+*******************************************************************************
+*** HEAP SELECTION
+***
+
+The basic heap was selected because no calls to memory allocation
+functions were found in the application outside of system library
+functions, and there are calls to deallocation functions in the
+application.
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"A0":  place at 0x08000000 { ro section .intvec };
+"P1":  place in [from 0x08000000 to 0x0803ffff] { ro };
+define block CSTACK with size = 4K, alignment = 8 { };
+define block HEAP with size = 4K, alignment = 8 { };
+"P2":  place in [from 0x20000000 to 0x2000ffff] {
+          rw, block CSTACK, block HEAP };
+
+No sections matched the following patterns:
+
+  rw  in "P2"
+
+
+  Section   Kind        Address    Size  Object
+  -------   ----        -------    ----  ------
+"A0":                             0x150
+  .intvec   ro code  0x08000000   0x150  startup_stm32f10x_cl.o [1]
+                   - 0x08000150   0x150
+
+"P1":                             0x608
+  .text     ro code  0x08000150   0x23c  main.o [1]
+  .text     ro code  0x0800038c    0x86  ABImemcpy.o [4]
+  .text     ro code  0x08000414   0x1a4  system_stm32f10x.o [1]
+  .text     ro code  0x080005b8    0x1e  cmain.o [4]
+  .text     ro code  0x080005d6     0x4  low_level_init.o [3]
+  .text     ro code  0x080005da     0x4  exit.o [3]
+  .text     ro code  0x080005e0     0xa  cexit.o [4]
+  .text     ro code  0x080005ec    0x14  exit.o [5]
+  .text     ro code  0x08000600    0x12  stm32f10x_it.o [1]
+  .rodata   const    0x08000614    0x10  main.o [1]
+  .text     ro code  0x08000624    0x10  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000634     0xc  cstartup_M.o [4]
+  .text     ro code  0x08000640     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000644     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000648     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800064c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000650     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000654     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000658     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800065c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000660     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000664     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000668     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800066c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000670     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000674     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000678     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800067c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000680     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000684     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000688     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800068c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000690     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000694     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000698     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800069c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006a0     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006a4     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006a8     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006ac     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006b0     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006b4     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006b8     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006bc     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006c0     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006c4     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006c8     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006cc     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006d0     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006d4     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006d8     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006dc     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006e0     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006e4     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006e8     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006ec     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006f0     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006f4     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006f8     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x080006fc     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000700     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000704     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000708     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800070c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000710     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000714     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000718     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800071c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000720     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000724     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000728     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800072c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000730     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000734     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000738     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800073c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000740     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000744     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000748     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x0800074c     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000750     0x4  startup_stm32f10x_cl.o [1]
+  .text     ro code  0x08000754     0x4  startup_stm32f10x_cl.o [1]
+                   - 0x08000758   0x608
+
+"P2":                            0x1000
+  CSTACK             0x20000000  0x1000  <Block>
+    CSTACK  uninit   0x20000000  0x1000  <Block tail>
+                   - 0x20001000  0x1000
+
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module                  ro code  ro data  rw data
+    ------                  -------  -------  -------
+C:\Users\pnu3\Desktop\JoyStick\Debug\Obj: [1]
+    main.o                      572       16
+    startup_stm32f10x_cl.o      632
+    stm32f10x_it.o               18
+    system_stm32f10x.o          420
+    -------------------------------------------------
+    Total:                    1 642       16
+
+command line: [2]
+    -------------------------------------------------
+    Total:
+
+dl7M_tln.a: [3]
+    exit.o                        4
+    low_level_init.o              4
+    -------------------------------------------------
+    Total:                        8
+
+rt7M_tl.a: [4]
+    ABImemcpy.o                 134
+    cexit.o                      10
+    cmain.o                      30
+    cstartup_M.o                 12
+    -------------------------------------------------
+    Total:                      186
+
+shb_l.a: [5]
+    exit.o                       20
+    -------------------------------------------------
+    Total:                       20
+
+    Gaps                          6        2
+    Linker created                              4 096
+-----------------------------------------------------
+    Grand Total:              1 862       18    4 096
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                      Address   Size  Type      Object
+-----                      -------   ----  ----      ------
+?main                   0x080005b9         Code  Gb  cmain.o [4]
+BusFault_Handler        0x08000607    0x2  Code  Gb  stm32f10x_it.o [1]
+CSTACK$$Base            0x20000000          --   Gb  - Linker created -
+CSTACK$$Limit           0x20001000          --   Gb  - Linker created -
+DebugMon_Handler        0x0800060d    0x2  Code  Gb  stm32f10x_it.o [1]
+HardFault_Handler       0x08000603    0x2  Code  Gb  stm32f10x_it.o [1]
+MemManage_Handler       0x08000605    0x2  Code  Gb  stm32f10x_it.o [1]
+NMI_Handler             0x08000601    0x2  Code  Gb  stm32f10x_it.o [1]
+PendSV_Handler          0x0800060f    0x2  Code  Gb  stm32f10x_it.o [1]
+PortConfiguration       0x080002db   0x1a  Code  Gb  main.o [1]
+RCC_Enable              0x080002cd    0xe  Code  Gb  main.o [1]
+Region$$Table$$Base     0x00000000          --   Gb  - Linker created -
+Region$$Table$$Limit    0x00000000          --   Gb  - Linker created -
+SVC_Handler             0x0800060b    0x2  Code  Gb  stm32f10x_it.o [1]
+SetSysClock             0x080001a9  0x124  Code  Gb  main.o [1]
+SetSysClock             0x0800047b    0x8  Code  Lc  system_stm32f10x.o [1]
+SetSysClockTo72         0x08000483  0x110  Code  Lc  system_stm32f10x.o [1]
+SysInit                 0x08000151   0x58  Code  Gb  main.o [1]
+SysTick_Handler         0x08000611    0x2  Code  Gb  stm32f10x_it.o [1]
+SystemInit              0x08000415   0x66  Code  Gb  system_stm32f10x.o [1]
+UartInit                0x080002f5   0x3a  Code  Gb  main.o [1]
+UsageFault_Handler      0x08000609    0x2  Code  Gb  stm32f10x_it.o [1]
+__aeabi_memcpy4         0x0800038d         Code  Gb  ABImemcpy.o [4]
+__aeabi_memcpy8         0x0800038d         Code  Gb  ABImemcpy.o [4]
+__cmain                 0x080005b9         Code  Gb  cmain.o [4]
+__exit                  0x080005ed   0x14  Code  Gb  exit.o [5]
+__iar_program_start     0x08000635         Code  Gb  cstartup_M.o [4]
+__iar_systems$$module {Abs}
+                        0x00000001         Data  Gb  command line/config [2]
+__low_level_init        0x080005d7    0x4  Code  Gb  low_level_init.o [3]
+__vector_table          0x08000000         Data  Gb  startup_stm32f10x_cl.o [1]
+_call_main              0x080005c5         Code  Gb  cmain.o [4]
+_exit                   0x080005e1         Code  Gb  cexit.o [4]
+_main                   0x080005d3         Code  Gb  cmain.o [4]
+exit                    0x080005db    0x4  Code  Gb  exit.o [3]
+main                    0x0800032f   0x22  Code  Gb  main.o [1]
+
+
+[1] = C:\Users\pnu3\Desktop\JoyStick\Debug\Obj
+[2] = command line
+[3] = dl7M_tln.a
+[4] = rt7M_tl.a
+[5] = shb_l.a
+
+  1 862 bytes of readonly  code memory
+     18 bytes of readonly  data memory
+  4 096 bytes of readwrite data memory
+
+Errors: none
+Warnings: none
