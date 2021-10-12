@@ -1,4 +1,13 @@
 #include "stm32f10x.h"
+#define  RCC_APB2ENR    (*(volatile unsigned int*)0x40021018) 
+#define  GPIOA_CRL     (*(volatile unsigned int*)0x40010800)
+#define  GPIOB_CRL     (*(volatile unsigned int*)0x40010C00)
+#define  GPIOB_ODR    (*(volatile unsigned int*)(0x40010C00 + 0x0C))
+#define  GPIOC_CRL     (*(volatile unsigned int*)0x40011000)
+#define  GPIOC_ODR    (*(volatile unsigned int*)(0x40011000 + 0x0C))
+#define  GPIOD_CRL     (*(volatile unsigned int*)0x40011400)
+#define  GPIOD_BSRR    (*(volatile unsigned int*)(0x40011400 + 0x10))
+
 
 void SysInit(void) {
     /* Set HSION bit */
@@ -52,20 +61,20 @@ void SetSysClock(void) {
         FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
         FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;
 
-//@TODO - 1 Set the clock, (//) ï¿½Ö¼ï¿½ Ç¥ï¿½Ã¸ï¿½ ï¿½ï¿½ï¿½Ö°ï¿½ Æ²ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï½Ã¿ï¿½ 
+//@TODO - 1 Set the clock, (//) ??? ??©ª? ????? ??? ???? ???? ????? ?? ?????? ??????y? 
         /* HCLK = SYSCLK */
         RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
-        /* PCLK2 = HCLK / ?, use PPRE2 */
-        RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV2;  // ìˆ˜ì •  --> 32
+        /* PCLK2 = HCLK / 2, use PPRE2 */
+        RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV2; // ¼öÁ¤
         /* PCLK1 = HCLK */
         RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
 
         /* Configure PLLs ------------------------------------------------------*/
         RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL);
-        RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLMULL4);
+        RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLMULL4); // ¼öÁ¤
 
         RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL | RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
-        RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 | RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV5);
+        RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 | RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV5); // ¼öÁ¤
 //@End of TODO - 1
 
         /* Enable PLL2 */
@@ -90,7 +99,7 @@ void SetSysClock(void) {
         /* Select System Clock as output of MCO */
 //@TODO - 2 Set the MCO port for system clock output
         RCC->CFGR &= ~(uint32_t)RCC_CFGR_MCO;
-        RCC->CFGR |= (uint32_t)RCC_CFGR_MCO_SYSCLK;
+        RCC->CFGR |= (uint32_t)RCC_CFGR_MCO_SYSCLK; // ¼öÁ¤
 //@End of TODO - 2
     }
     else {
@@ -104,11 +113,11 @@ void RCC_Enable(void) {
     /*---------------------------- RCC Configuration -----------------------------*/
     /* GPIO RCC Enable  */
     /* UART Tx, Rx, MCO port */
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN; // ¼öÁ¤
     /* USART RCC Enable */
-    RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+    // RCC->APB2ENR |= ??
 	/* User S1 Button RCC Enable */
-	RCC->APB2ENR |= RCC_APB2ENR_IOPDEN;
+	// RCC->APB2ENR |= ??
 }
 
 void PortConfiguration(void) {
@@ -120,15 +129,14 @@ void PortConfiguration(void) {
 	    (GPIO_CRH_CNF10 | GPIO_CRH_MODE10)
 	);
     /* MCO Pin Configuration */
-    GPIOA->CRH |= GPIO_CRH_MODE8 | GPIO_CRH_CNF8_1;
+     GPIOA->CRH |= (GPIO_CRH_MODE8 | GPIO_CRH_CNF8_1); // ¼öÁ¤
     /* USART Pin Configuration */
-    GPIOA->CRH |= GPIO_CRH_MODE9 | GPIO_CRH_CNF9_1;
-    GPIOA->CRH |= GPIO_CRH_CNF10_1;
+    // GPIOA->CRH |= ??
     
     /* Reset(Clear) Port D CRH - User S1 Button */
-    GPIOD->CRH &= ~(GPIO_CRH_MODE11 | GPIO_CRH_CNF11);
+    // GPIOD->CRH &= ??
     /* User S1 Button Configuration */
-    GPIOD->CRH |= GPIO_CRH_CNF11_1;
+    // GPIOD->CRH |= ??
 }
 
 void UartInit(void) {
@@ -138,13 +146,13 @@ void UartInit(void) {
     /* Configure the USART Word Length, Parity and mode ----------------------- */
     /* Set the M bits according to USART_WordLength value */
 //@TODO - 6: WordLength : 8bit
-    // Do Noting
+    
     /* Set PCE and PS bits according to USART_Parity value */
 //@TODO - 7: Parity : None
-    // Do Nothing
+    
     /* Set TE and RE bits according to USART_Mode value */
 //@TODO - 8: Enable Tx and Rx
-    USART1->CR1 |= (USART_CR1_TE | USART_CR1_TE);
+    // USART1->CR1 |= ??
 
     /*---------------------------- USART CR2 Configuration -----------------------*/
     /* Clear STOP[13:12] bits */
@@ -153,7 +161,7 @@ void UartInit(void) {
     USART1->CR2 &= ~(uint32_t)(USART_CR2_CPHA | USART_CR2_CPOL | USART_CR2_CLKEN);
     /* Set STOP[13:12] bits according to USART_StopBits value */
 //@TODO - 9: Stop bit : 1bit
-    // Do Nothing
+    
 
     /*---------------------------- USART CR3 Configuration -----------------------*/
     /* Clear CTSE and RTSE bits */
@@ -161,19 +169,19 @@ void UartInit(void) {
     /* Configure the USART HFC -------------------------------------------------*/
     /* Set CTSE and RTSE bits according to USART_HardwareFlowControl value */
 //@TODO - 10: CTS, RTS : disable
-    // Do Noting
+
 
     /*---------------------------- USART BRR Configuration -----------------------*/
     /* Configure the USART Baud Rate -------------------------------------------*/
     /* Determine the integer part */
     /* Determine the fractional part */
 //@TODO - 11: Calculate & configure BRR
-    USART1->BRR |= 0x22B;
+    // USART1->BRR |= ??
 
     /*---------------------------- USART Enable ----------------------------------*/
     /* USART Enable Configuration */
 //@TODO - 12: Enable UART (UE)
-    USART1->CR1 |= USART_CR1_UE;
+    // USART1->CR1 |= ??
 }
 
 void delay(void){
@@ -189,8 +197,10 @@ void SendData(uint16_t data) {
 	while ((USART1->SR & USART_SR_TC) == 0);
 }
 
+
 int main() {
-	char msg[] = "Hello Team03\r\n";
+    int i;
+    char msg[] = "Hello Team00\r\n";
 	
     SysInit();
     SetSysClock();
@@ -203,13 +213,9 @@ int main() {
     
     while (1) {
 		//@TODO - 13: Send the message when button is pressed
-		if ((GPIOD->IDR & (GPIO_IDR_IDR8))) {
-            int i = 0;
-            while (msg[i] != NULL) {
-                SendData(msg[i]);
-                i++;
-            }
-        }
+		
 	}
 
 }// end main
+
+
