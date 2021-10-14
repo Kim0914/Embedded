@@ -144,7 +144,7 @@ void UartInit(void) {
     // Do Nothing
     /* Set TE and RE bits according to USART_Mode value */
 //@TODO - 8: Enable Tx and Rx
-    USART1->CR1 |= (USART_CR1_TE | USART_CR1_TE);
+    USART1->CR1 |= (USART_CR1_TE | USART_CR1_RE);
 
     /*---------------------------- USART CR2 Configuration -----------------------*/
     /* Clear STOP[13:12] bits */
