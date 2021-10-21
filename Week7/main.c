@@ -1,4 +1,3 @@
-
 #include "stm32f10x.h"
 #include "stm32f10x_exti.h"
 #include "stm32f10x_gpio.h"
@@ -28,6 +27,7 @@ void LED_Backward();
 uint32_t volatile flag = 0;
 //---------------------------------------------------------------------------------------------------
 
+uint16_t led_pins[] = {GPIO_Pin_7, GPIO_Pin_4, GPIO_Pin_3, GPIO_Pin_2};
 
 void RCC_Configure(void)
 {
@@ -79,7 +79,7 @@ void GPIO_Configure(void)
     //TX
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
    
 	//RX
@@ -131,7 +131,7 @@ void USART1_Init(void)
 	USART_Cmd(USART1, ENABLE);
 	
 	// TODO: Initialize the USART using the structure 'USART_InitTypeDef' and the function 'USART_Init'
-	USART1_InitStructure.USART_BaudRate = IS_USART_BAUDRATE(28800);
+	USART1_InitStructure.USART_BaudRate = 28800;
 	USART1_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART1_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART1_InitStructure.USART_Parity = USART_Parity_No;
@@ -186,8 +186,11 @@ void NVIC_Configure(void) {
     NVIC_Init(&NVIC_InitStructure);
 }
 
-void LED_Forward() {
-	// 2347
+void LED_Backward() {
+  
+	GPIO_ResetBits(GPIOD, GPIO_Pin_7 | GPIO_Pin_4 | GPIO_Pin_3 | GPIO_Pin_2);
+	// 7432
+/*
 	GPIO_SetBits(GPIOD, GPIO_Pin_2);
 	Delay();
 	GPIO_ResetBits(GPIOD, GPIO_Pin_2);
@@ -203,15 +206,24 @@ void LED_Forward() {
 	GPIO_SetBits(GPIOD, GPIO_Pin_7);
 	Delay();
 	GPIO_ResetBits(GPIOD, GPIO_Pin_7);
-
+*/
+        for(int i = 3; i >= 0; i--){
+            if(flag == 1){
+	        GPIO_SetBits(GPIOD, led_pins[i]);
+	        Delay();
+	        GPIO_ResetBits(GPIOD, led_pins[i]);
+            }
+        }
 }
 
-void LED_Backward() {
-	// 7432
-	GPIO_SetBits(GPIOD, GPIO_Pin_7);
-	Delay();
-	GPIO_ResetBits(GPIOD, GPIO_Pin_7);
-
+void LED_Forward() {
+  
+	GPIO_ResetBits(GPIOD, GPIO_Pin_7 | GPIO_Pin_4 | GPIO_Pin_3 | GPIO_Pin_2);
+	// 2347
+/*
+        GPIO_SetBits(GPIOD, GPIO_Pin_7);
+        Delay();
+        GPIO_ResetBits(GPIOD, GPIO_Pin_7);
 	GPIO_SetBits(GPIOD, GPIO_Pin_4);
 	Delay();
 	GPIO_ResetBits(GPIOD, GPIO_Pin_4);
@@ -223,6 +235,15 @@ void LED_Backward() {
 	GPIO_SetBits(GPIOD, GPIO_Pin_2);
 	Delay();
 	GPIO_ResetBits(GPIOD, GPIO_Pin_2);
+ */      
+        for(int i = 0; i < 4; i++){
+            if(flag == 0){
+	        GPIO_SetBits(GPIOD, led_pins[i]);
+	        Delay();
+	        GPIO_ResetBits(GPIOD, led_pins[i]);
+            }
+        }
+
 }
 
 void USART1_IRQHandler() {
@@ -234,10 +255,12 @@ void USART1_IRQHandler() {
         // TODO implement
         if (word == 'a') {
         	// 1 2 3 4
+		flag = 0;
         	LED_Forward();
         } 
         else if (word == 'b') {
         	// 4 3 2 1
+		flag = 1;
         	LED_Backward();
         }
 
@@ -252,12 +275,12 @@ void EXTI15_10_IRQHandler(void) { // when the button is pressed
 	if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
 		if (GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_11) == Bit_RESET) {
 			// TODO implement
-	        int i = 0;
-	        while (msg[i] != 0) {
-	            sendDataUART1(msg[i]);
-                i++;
-	        }
-		}
+                    int i = 0;
+                    while (msg[i] != 0) {
+                        sendDataUART1(msg[i]);
+                        i++;
+                    }
+                }
         EXTI_ClearITPendingBit(EXTI_Line11);
 	}
 }
@@ -269,6 +292,7 @@ void EXTI9_5_IRQHandler(void){ // Joystick UP (port 5)
 			// TODO implement
 			// 1 2 3 4
 			flag = 0;
+                        LED_Forward();
 		}
         EXTI_ClearITPendingBit(EXTI_Line5);
 	}
@@ -281,6 +305,7 @@ void EXTI2_IRQHandler(void){ // Joystick down (port 2)
 			// TODO implement
 			// 4 3 2 1
 			flag = 1;
+                        LED_Backward();
 		}
         EXTI_ClearITPendingBit(EXTI_Line2);
 	}
@@ -316,7 +341,6 @@ int main(void)
     while (1) {
     	// TODO: implement 
     	// 1 2 3 4 
-      sendDataUART1('a');
       if(flag == 0){
     	LED_Forward();
       }
