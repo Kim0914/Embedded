@@ -270,7 +270,7 @@ void USART1_IRQHandler() {
 }
 
 void EXTI15_10_IRQHandler(void) { // when the button is pressed
-	char msg[] = "Hello Team03\r\n";
+	char msg[] = "TEAM03.\r\n";
 	
 	if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
 		if (GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_11) == Bit_RESET) {
