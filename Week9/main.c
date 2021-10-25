@@ -10,7 +10,7 @@
 void RCC_Configure(void);
 void GPIO_Configure(void);
 void EXTI_Configure(void);
-void USART1_Init(void);
+void Init_USART(void);
 void NVIC_Configure(void);
 
 void EXTI15_10_IRQHandler(void);
@@ -18,16 +18,8 @@ void EXTI15_10_IRQHandler(void);
 void Delay(void);
 
 void sendDataUART1(uint16_t data);
+void sendDataUART2(uint16_t data);
 
-// void LED_Forward();
-
-// void LED_Backward();
-
-
-// uint32_t volatile flag = 0;
-//---------------------------------------------------------------------------------------------------
-
-// uint16_t led_pins[] = {GPIO_Pin_7, GPIO_Pin_4, GPIO_Pin_3, GPIO_Pin_2};
 
 void RCC_Configure(void)
 {
@@ -36,7 +28,7 @@ void RCC_Configure(void)
 	/* USART1 clock enable */ //
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 	/* USART2 clock enable */ //
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART2, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 
 	/* Alternate Function IO clock enable */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
@@ -93,7 +85,7 @@ void EXTI_Configure(void)
     EXTI_Init(&EXTI_InitStructure);
 }
 
-void USART1_Init(void)
+void Init_USART(void)
 {
 	USART_InitTypeDef USART1_InitStructure;
 	USART_InitTypeDef USART2_InitStructure;
@@ -121,6 +113,7 @@ void USART1_Init(void)
 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
 	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
 }
+
 
 void NVIC_Configure(void) {
 
@@ -153,17 +146,8 @@ void USART1_IRQHandler() {
     	// the most recent received data by the USART1 peripheral
         word = USART_ReceiveData(USART1);
 
-        // TODO implement
-        if (word == 'a') {
-        	// 1 2 3 4
-		flag = 0;
-        	LED_Forward();
-        } 
-        else if (word == 'b') {
-        	// 4 3 2 1
-		flag = 1;
-        	LED_Backward();
-        }
+     
+        sendDataUART2(word);
 
         // clear 'Read data register not empty' flag
     	USART_ClearITPendingBit(USART1,USART_IT_RXNE);
@@ -171,12 +155,31 @@ void USART1_IRQHandler() {
 }
 
 // TODO!!!: USART2 handler
+void USART2_IRQHandler() {
+
+	uint16_t word;
+    if(USART_GetITStatus(USART2,USART_IT_RXNE)!=RESET){
+    	// the most recent received data by the USART1 peripheral
+        word = USART_ReceiveData(USART1);
+
+        sendDataUART1(word);
+        // clear 'Read data register not empty' flag
+    	USART_ClearITPendingBit(USART2,USART_IT_RXNE);
+    }
+}
+
+
 
 void sendDataUART1(uint16_t data) {
-	/* Wait till TC is set */
-	while ((USART1->SR & USART_SR_TC) == 0);
+	
 	USART_SendData(USART1, data);
 }
+
+void sendDataUART2(uint16_t data) {
+	
+	USART_SendData(USART2, data);
+}
+
 
 int main(void)
 {
@@ -189,7 +192,7 @@ int main(void)
 
     EXTI_Configure();
 
-    USART1_Init();
+    Init_USART();
 
     NVIC_Configure();
 
