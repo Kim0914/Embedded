@@ -69,7 +69,7 @@ void EXTI_Configure(void)
     EXTI_InitTypeDef EXTI_InitStructure;
 
     /* USART1: RX*/
-   	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource11);
+   	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource10);
     EXTI_InitStructure.EXTI_Line = EXTI_Line10;
     EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
     EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
@@ -77,7 +77,7 @@ void EXTI_Configure(void)
     EXTI_Init(&EXTI_InitStructure);
 
     /* USART2: RX*/
-   	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource11);
+   	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource3);
     EXTI_InitStructure.EXTI_Line = EXTI_Line3;
     EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
     EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
@@ -102,7 +102,7 @@ void Init_USART(void)
 	USART1_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_Init(USART1, &USART1_InitStructure);
 
-	USART2_InitStructure.USART_BaudRate = 28800;
+	USART2_InitStructure.USART_BaudRate = 9600;
 	USART2_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART2_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART2_InitStructure.USART_Parity = USART_Parity_No;
@@ -160,7 +160,7 @@ void USART2_IRQHandler() {
 	uint16_t word;
     if(USART_GetITStatus(USART2,USART_IT_RXNE)!=RESET){
     	// the most recent received data by the USART1 peripheral
-        word = USART_ReceiveData(USART1);
+        word = USART_ReceiveData(USART2);
 
         sendDataUART1(word);
         // clear 'Read data register not empty' flag
@@ -190,7 +190,7 @@ int main(void)
 
     GPIO_Configure();
 
-    EXTI_Configure();
+    //EXTI_Configure();
 
     Init_USART();
 
