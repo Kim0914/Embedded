@@ -95,13 +95,13 @@ void EXTI_Configure(void)
 
 void USART1_Init(void)
 {
-	// TODO!!!: USART 1, 2
 	USART_InitTypeDef USART1_InitStructure;
+	USART_InitTypeDef USART2_InitStructure;
 
-	// Enable the USART1 peripheral
+	// Enable the USART1, 2 peripheral
 	USART_Cmd(USART1, ENABLE);
+	USART_Cmd(USART2, ENABLE);
 	
-	// TODO: Initialize the USART using the structure 'USART_InitTypeDef' and the function 'USART_Init'
 	USART1_InitStructure.USART_BaudRate = 28800;
 	USART1_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART1_InitStructure.USART_StopBits = USART_StopBits_1;
@@ -109,48 +109,38 @@ void USART1_Init(void)
 	USART1_InitStructure.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
 	USART1_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_Init(USART1, &USART1_InitStructure);
+
+	USART2_InitStructure.USART_BaudRate = 28800;
+	USART2_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART2_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART2_InitStructure.USART_Parity = USART_Parity_No;
+	USART2_InitStructure.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx);
+	USART2_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART_Init(USART2, &USART2_InitStructure);
 	
-	// TODO: Enable the USART1 RX interrupts using the function 'USART_ITConfig' and the argument value 'Receive Data register not empty interrupt'
 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
 }
 
 void NVIC_Configure(void) {
 
     NVIC_InitTypeDef NVIC_InitStructure;
     
-    // TODO: fill the arg you want
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-
-	// TODO: Initialize the NVIC using the structure 'NVIC_InitTypeDef' and the function 'NVIC_Init'
-	
-    // Joystick Down
-    NVIC_EnableIRQ(EXTI2_IRQn);
-    NVIC_InitStructure.NVIC_IRQChannel = EXTI2_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = NVIC_IPR0_PRI_0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x2;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
-
-    // Joystick Up
-    NVIC_EnableIRQ(EXTI9_5_IRQn);
-    NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = NVIC_IPR0_PRI_0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x2;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
-
-    // User S1 Button
-    NVIC_EnableIRQ(EXTI15_10_IRQn);
-    NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = NVIC_IPR0_PRI_0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x3;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
 
     // UART1
 	// 'NVIC_EnableIRQ' is only required for USART setting
     NVIC_EnableIRQ(USART1_IRQn);
     NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = NVIC_IPR0_PRI_0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    // UART2
+	// 'NVIC_EnableIRQ' is only required for USART setting
+    NVIC_EnableIRQ(USART2_IRQn);
+    NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = NVIC_IPR0_PRI_0;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -203,17 +193,5 @@ int main(void)
 
     NVIC_Configure();
 
-    while (1) {
-    	// TODO: implement 
-    	// 1 2 3 4 
-      if(flag == 0){
-    	LED_Forward();
-      }
-      else{
-        LED_Backward();
-      }
-    	// Delay
-    	Delay();
-    }
-    return 0;
+    while (1);
 }
