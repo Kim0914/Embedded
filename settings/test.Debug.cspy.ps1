@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\pnu3\Desktop\JoyStick\settings\test.Debug.general.xcl" --backend -f "C:\Users\pnu3\Desktop\JoyStick\settings\test.Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\juhyeonlee\Desktop\Embedded\settings\test.Debug.general.xcl" --backend -f "C:\Users\juhyeonlee\Desktop\Embedded\settings\test.Debug.driver.xcl" 
 }
 else
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\pnu3\Desktop\JoyStick\settings\test.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\pnu3\Desktop\JoyStick\settings\test.Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\juhyeonlee\Desktop\Embedded\settings\test.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\juhyeonlee\Desktop\Embedded\settings\test.Debug.driver.xcl" 
 }

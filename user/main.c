@@ -1,221 +1,108 @@
 #include "stm32f10x.h"
-#define  RCC_APB2ENR    (*(volatile unsigned int*)0x40021018) 
-#define  GPIOA_CRL     (*(volatile unsigned int*)0x40010800)
-#define  GPIOB_CRL     (*(volatile unsigned int*)0x40010C00)
-#define  GPIOB_ODR    (*(volatile unsigned int*)(0x40010C00 + 0x0C))
-#define  GPIOC_CRL     (*(volatile unsigned int*)0x40011000)
-#define  GPIOC_ODR    (*(volatile unsigned int*)(0x40011000 + 0x0C))
-#define  GPIOD_CRL     (*(volatile unsigned int*)0x40011400)
-#define  GPIOD_BSRR    (*(volatile unsigned int*)(0x40011400 + 0x10))
+#include "core_cm3.h"
+#include "misc.h"
+#include "stm32f10x_gpio.h"
+#include "stm32f10x_rcc.h"
+#include "stm32f10x_usart.h"
+#include "stm32f10x_adc.h"
+#include "lcd.h"
+#include "touch.h"
 
+volatile uint8_t light;
 
-void SysInit(void) {
-    /* Set HSION bit */
-    /* Internal Clock Enable */
-    RCC->CR |= (uint32_t)0x00000001; //HSION
+int color[12] =
+{WHITE,CYAN,BLUE,RED,MAGENTA,LGRAY,GREEN,YELLOW,BROWN,BRRED,GRAY};
 
-    /* Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits */
-    RCC->CFGR &= (uint32_t)0xF0FF0000;
+// void SystemInit(void)
+// {
+// 	//TODO
+// }
 
-    /* Reset HSEON, CSSON and PLLON bits */
-    RCC->CR &= (uint32_t)0xFEF6FFFF;
+void RCC_Configure(void)
+{
+	// PB3 (sensor pin)
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 
-    /* Reset HSEBYP bit */
-    RCC->CR &= (uint32_t)0xFFFBFFFF;
+	// ADC
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
 
-    /* Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits */
-    RCC->CFGR &= (uint32_t)0xFF80FFFF;
-
-    /* Reset PLL2ON and PLL3ON bits */
-    RCC->CR &= (uint32_t)0xEBFFFFFF;
-
-    /* Disable all interrupts and clear pending bits  */
-    RCC->CIR = 0x00FF0000;
-
-    /* Reset CFGR2 register */
-    RCC->CFGR2 = 0x00000000;
+	/* Alternate Function IO clock enable */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 }
 
-void SetSysClock(void) {
-    volatile uint32_t StartUpCounter = 0, HSEStatus = 0;
-    /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/
-    /* Enable HSE */
-    RCC->CR |= ((uint32_t)RCC_CR_HSEON);
-    /* Wait till HSE is ready and if Time out is reached exit */
-    do {
-        HSEStatus = RCC->CR & RCC_CR_HSERDY;
-        StartUpCounter++;
-    } while ((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+void GPIO_Configure(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
 
-    if ((RCC->CR & RCC_CR_HSERDY) != RESET) {
-        HSEStatus = (uint32_t)0x01;
-    }
-    else {
-        HSEStatus = (uint32_t)0x00;
-    }
-
-    if (HSEStatus == (uint32_t)0x01) {
-        /* Enable Prefetch Buffer */
-        FLASH->ACR |= FLASH_ACR_PRFTBE;
-        /* Flash 0 wait state */
-        FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
-        FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;
-
-//@TODO - 1 Set the clock, (//) ??? ??ø? ????? ??? ???? ???? ????? ?? ?????? ??????y? 
-        /* HCLK = SYSCLK */
-        RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
-        /* PCLK2 = HCLK / 2, use PPRE2 */
-        RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV2; // 수정
-        /* PCLK1 = HCLK */
-        RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
-
-        /* Configure PLLs ------------------------------------------------------*/
-        RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL);
-        RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLMULL4); // 수정
-
-        RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL | RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
-        RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 | RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV5); // 수정
-//@End of TODO - 1
-
-        /* Enable PLL2 */
-        RCC->CR |= RCC_CR_PLL2ON;
-        /* Wait till PLL2 is ready */
-        while ((RCC->CR & RCC_CR_PLL2RDY) == 0)
-        {
-        }
-        /* Enable PLL */
-        RCC->CR |= RCC_CR_PLLON;
-        /* Wait till PLL is ready */
-        while ((RCC->CR & RCC_CR_PLLRDY) == 0)
-        {
-        }
-        /* Select PLL as system clock source */
-        RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
-        RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
-        /* Wait till PLL is used as system clock source */
-        while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08)
-        {
-        }
-        /* Select System Clock as output of MCO */
-//@TODO - 2 Set the MCO port for system clock output
-        RCC->CFGR &= ~(uint32_t)RCC_CFGR_MCO;
-        RCC->CFGR |= (uint32_t)RCC_CFGR_MCO_SYSCLK; // 수정
-//@End of TODO - 2
-    }
-    else {
-        /* If HSE fails to start-up, the application will have wrong clock
-        configuration. User can add here some code to deal with this error */
-    }
+    // PB3
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
 
-void RCC_Enable(void) {
-//@TODO - 3 RCC Setting
-    /*---------------------------- RCC Configuration -----------------------------*/
-    /* GPIO RCC Enable  */
-    /* UART Tx, Rx, MCO port */
-     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN; // 수정
-    /* USART RCC Enable */
-    // RCC->APB2ENR |= ??
-	/* User S1 Button RCC Enable */
-	// RCC->APB2ENR |= ??
+void ADC_Configure(void)
+{
+	ADC_InitTypeDef ADC_InitStructure;
+
+	ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
+	ADC_InitStructure.ADC_ScanConvMode = DISABLE;
+	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
+	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+	ADC_InitStructure.ADC_NbrOfChannel = 1;
+	ADC_Init(ADC1, &ADC_InitStructure);
+	ADC_Cmd(ADC1, ENABLE);
 }
 
-void PortConfiguration(void) {
-//@TODO - 4 GPIO Configuration
-    /* Reset(Clear) Port A CRH - MCO, USART1 TX,RX*/
-    GPIOA->CRH &= ~(
-	    (GPIO_CRH_CNF8 | GPIO_CRH_MODE8) |
-	    (GPIO_CRH_CNF9 | GPIO_CRH_MODE9) |
-	    (GPIO_CRH_CNF10 | GPIO_CRH_MODE10)
-	);
-    /* MCO Pin Configuration */
-     GPIOA->CRH |= (GPIO_CRH_MODE8 | GPIO_CRH_CNF8_1); // 수정
-    /* USART Pin Configuration */
-    // GPIOA->CRH |= ??
+void NVIC_Configure(void) {
+
+    NVIC_InitTypeDef NVIC_InitStructure;
     
-    /* Reset(Clear) Port D CRH - User S1 Button */
-    // GPIOD->CRH &= ??
-    /* User S1 Button Configuration */
-    // GPIOD->CRH |= ??
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+
+    // PB3
+    NVIC_EnableIRQ(EXTI3_IRQn);
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI3_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = NVIC_IPR0_PRI_0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
 }
 
-void UartInit(void) {
-    /*---------------------------- USART CR1 Configuration -----------------------*/
-    /* Clear M, PCE, PS, TE and RE bits */
-    USART1->CR1 &= ~(uint32_t)(USART_CR1_M | USART_CR1_PCE | USART_CR1_PS | USART_CR1_TE | USART_CR1_RE);
-    /* Configure the USART Word Length, Parity and mode ----------------------- */
-    /* Set the M bits according to USART_WordLength value */
-//@TODO - 6: WordLength : 8bit
-    
-    /* Set PCE and PS bits according to USART_Parity value */
-//@TODO - 7: Parity : None
-    
-    /* Set TE and RE bits according to USART_Mode value */
-//@TODO - 8: Enable Tx and Rx
-    // USART1->CR1 |= ??
-
-    /*---------------------------- USART CR2 Configuration -----------------------*/
-    /* Clear STOP[13:12] bits */
-    USART1->CR2 &= ~(uint32_t)(USART_CR2_STOP);
-    /* Configure the USART Stop Bits, Clock, CPOL, CPHA and LastBit ------------*/
-    USART1->CR2 &= ~(uint32_t)(USART_CR2_CPHA | USART_CR2_CPOL | USART_CR2_CLKEN);
-    /* Set STOP[13:12] bits according to USART_StopBits value */
-//@TODO - 9: Stop bit : 1bit
-    
-
-    /*---------------------------- USART CR3 Configuration -----------------------*/
-    /* Clear CTSE and RTSE bits */
-    USART1->CR3 &= ~(uint32_t)(USART_CR3_CTSE | USART_CR3_RTSE);
-    /* Configure the USART HFC -------------------------------------------------*/
-    /* Set CTSE and RTSE bits according to USART_HardwareFlowControl value */
-//@TODO - 10: CTS, RTS : disable
-
-
-    /*---------------------------- USART BRR Configuration -----------------------*/
-    /* Configure the USART Baud Rate -------------------------------------------*/
-    /* Determine the integer part */
-    /* Determine the fractional part */
-//@TODO - 11: Calculate & configure BRR
-    // USART1->BRR |= ??
-
-    /*---------------------------- USART Enable ----------------------------------*/
-    /* USART Enable Configuration */
-//@TODO - 12: Enable UART (UE)
-    // USART1->CR1 |= ??
+void EXIT3_IRQnHandler(){
+  if(EXTI_GetITStatus(EXTI_Line3)){
+    light = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_3);
+    EXTI_ClearITPendingBit(EXTI_Line3);
+  }
 }
-
-void delay(void){
-    int i = 0;
-    for(i=0;i<1000000;i++);
-}
-
-void SendData(uint16_t data) {
-    /* Transmit Data */
-	USART1->DR = data;
-
-	/* Wait till TC is set */
-	while ((USART1->SR & USART_SR_TC) == 0);
-}
-
 
 int main() {
-    int i;
-    char msg[] = "Hello Team00\r\n";
-	
-    SysInit();
-    SetSysClock();
-    RCC_Enable();
-    PortConfiguration();
-    UartInit();
-    
-    // if you need, init pin values here
-    
-    
-    while (1) {
-		//@TODO - 13: Send the message when button is pressed
+	//LCD °u·A ¼³A¤Aº LCD_Init ¿¡ ±¸CoμC¾i AOA¸¹C·I ¿ⓒ±a¼­ CO CE¿a ¾øA½
+	SystemInit();
+	RCC_Configure();
+	GPIO_Configure();
+	ADC_Configure();
+	NVIC_Configure();
+
+	LCD_Init();
+	Touch_Configuration();
+	Touch_Adjust();
+	LCD_Clear(WHITE);
+
+	while(1){
+          
+                uint16_t pos_x, x = 0;
+                uint16_t pos_y, y = 0;
 		
+                // LCD °ª Aa·A ¹× AIA¡ AAC￥ AÐ±a
+                LCD_ShowString(40, 40, "MON_TEAM03", color[11], color[0]); // TEAM_03 Aa·A
+                
+                
+                Touch_GetXY(&pos_x, &pos_y, 1);
+                Convert_Pos(pos_x, pos_y, &x, &y);
+                LCD_ShowNum(60, 150, x, 10, color[11], color[0]); // xAAC￥ Aa·A
+                LCD_ShowNum(60, 180, y, 10, color[11], color[0]); // yAAC￥ Aa·A
+                LCD_DrawCircle(x, y, 5); // AIA¡CN AU¸®¿¡ μ¿±×¶o¹I ±×¸®±a
+                LCD_ShowNum(60, 300, light, 10, color[11], color[0]); // A¶μμ °ª Aa·A               
 	}
-
-}// end main
-
-
+}

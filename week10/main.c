@@ -13,11 +13,6 @@ volatile uint8_t light;
 int color[12] =
 {WHITE,CYAN,BLUE,RED,MAGENTA,LGRAY,GREEN,YELLOW,BROWN,BRRED,GRAY};
 
-// void SystemInit(void)
-// {
-// 	//TODO
-// }
-
 void RCC_Configure(void)
 {
 	// PB3 (sensor pin)
@@ -50,8 +45,35 @@ void ADC_Configure(void)
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
 	ADC_InitStructure.ADC_NbrOfChannel = 1;
-	ADC_Init(ADC1, &ADC_InitStructure);
-	ADC_Cmd(ADC1, ENABLE);
+
+  ADC_Init(ADC1, &ADC_InitStructure);
+    
+  // ADC_RegularChannelConfig(ADC_TypeDef* ADCx, uint8_t ADC_Channel, uint8_t Rank, uint8_t ADC_SampleTime)
+  ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 1, ADC_SampleTime_28Cycles5);
+    
+  // ADC_ITConfig(ADC_TypeDef* ADCx, uint16_t ADC_IT, FunctionalState NewState)
+    
+    
+  // ADC_Cmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+  // ADON bit setting - A/D Converter on/off
+  ADC_Cmd(ADC1, ENABLE);
+    
+  // ADC_ResetCalibration(ADC_TypeDef* ADCx)
+  // initialize calibration bit
+  ADC_ResetCalibration(ADC1);
+    
+  // calibration bit setting check
+  while( ADC_GetResetCalibrationStatus(ADC1) )
+    ;
+    
+  // ADC_StartCalibration(ADC_TypeDef* ADCx)
+  ADC_StartCalibration(ADC1);
+    
+  while( ADC_GetCalibrationStatus(ADC1) )
+    ;
+    
+  // void ADC_SoftwareStartConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState)
+  ADC_SoftwareStartConvCmd(ADC1, ENABLE);
 }
 
 void NVIC_Configure(void) {
@@ -60,24 +82,22 @@ void NVIC_Configure(void) {
     
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
 
-    // PB3
-    NVIC_EnableIRQ(EXTI3_IRQn);
-    NVIC_InitStructure.NVIC_IRQChannel = EXTI3_IRQn;
+    NVIC_EnableIRQ(ADC1_2_IRQn);
+    NVIC_InitStructure.NVIC_IRQChannel = ADC1_2_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = NVIC_IPR0_PRI_0;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 }
 
-void EXIT3_IRQnHandler(){
-  if(EXTI_GetITStatus(EXTI_Line3)){
-    light = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_3);
-    EXTI_ClearITPendingBit(EXTI_Line3);
+void ADC1_2_IRQnHandler(){
+  if(ADC_GetITStatus(ADC1, ADC_IT_EOC) != RESET){
+    light = ADC_GetConversionValue(ADC1);
+    ADC_ClearITPendingBit(ADC1, ADC_IT_EOC);
   }
 }
 
 int main() {
-	//LCD 관련 설정은 LCD_Init 에 구현되어 있으므로 여기서 할 필요 없음
 	SystemInit();
 	RCC_Configure();
 	GPIO_Configure();
@@ -88,21 +108,20 @@ int main() {
 	Touch_Configuration();
 	Touch_Adjust();
 	LCD_Clear(WHITE);
+        uint16_t pos_x, x = 0;
+        uint16_t pos_y, y = 0;
 
 	while(1){
-          
-                uint16_t pos_x, x = 0;
-                uint16_t pos_y, y = 0;
-		
-                // LCD 값 출력 및 터치 좌표 읽기
                 LCD_ShowString(40, 40, "MON_TEAM03", color[11], color[0]); // TEAM_03 출력
                 
-                
-                Touch_GetXY(&pos_x, &pos_y, 1);
-                Convert_Pos(pos_x, pos_y, &x, &y);
-                LCD_ShowNum(60, 150, x, 10, color[11], color[0]); // x좌표 출력
-                LCD_ShowNum(60, 180, y, 10, color[11], color[0]); // y좌표 출력
-                LCD_DrawCircle(x, y, 5); // 터치한 자리에 동그라미 그리기
-                LCD_ShowNum(60, 300, light, 10, color[11], color[0]); // 조도 값 출력               
+                if(Touch_GexX(&pos_y,1)){
+                  Touch_GexY(&pos_x,1);
+                  Touch_GetXY(&pos_x, &pos_y, 0);
+                  Convert_Pos(pos_x, pos_y, &x, &y);
+                  LCD_ShowNum(60, 150, pos_x, 10, color[11], color[0]); // x좌표 출력
+                  LCD_ShowNum(60, 180, pos_y, 10, color[11], color[0]); // y좌표 출력
+                  LCD_DrawCircle(x, y, 5); // 터치한 자리에 동그라미 그리기
+                  LCD_ShowNum(60, 300, light, 10, color[11], color[0]); // 조도 값 출력
+                }
 	}
 }
