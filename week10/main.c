@@ -112,16 +112,18 @@ int main() {
         uint16_t pos_y, y = 0;
 
 	while(1){
-                LCD_ShowString(40, 40, "MON_TEAM03", color[11], color[0]); // TEAM_03 Ãâ·Â
-                
-                if(Touch_GexX(&pos_y,1)){
-                  Touch_GexY(&pos_x,1);
-                  Touch_GetXY(&pos_x, &pos_y, 0);
-                  Convert_Pos(pos_x, pos_y, &x, &y);
-                  LCD_ShowNum(60, 150, pos_x, 10, color[11], color[0]); // xÁÂÇ¥ Ãâ·Â
-                  LCD_ShowNum(60, 180, pos_y, 10, color[11], color[0]); // yÁÂÇ¥ Ãâ·Â
-                  LCD_DrawCircle(x, y, 5); // ÅÍÄ¡ÇÑ ÀÚ¸®¿¡ µ¿±×¶ó¹Ì ±×¸®±â
-                  LCD_ShowNum(60, 300, light, 10, color[11], color[0]); // Á¶µµ °ª Ãâ·Â
-                }
+
+                uint16_t pos_x, x = 0;
+                uint16_t pos_y, y = 0;
+
+                // LCD ê°’ ì¶œë ¥ ë° í„°ì¹˜ ì¢Œí‘œ ì½ê¸°
+                LCD_ShowString(40, 40, "MON_TEAM03", color[11], color[0]); // TEAM_03 ì¶œë ¥
+
+                Touch_GetXY(&pos_x, &pos_y, 1);
+                Convert_Pos(pos_x, pos_y, &x, &y);
+                LCD_ShowNum(60, 150, x, 10, color[11], color[0]); // xì¢Œí‘œ ì¶œë ¥
+                LCD_ShowNum(60, 180, y, 10, color[11], color[0]); // yì¢Œí‘œ ì¶œë ¥
+                LCD_DrawCircle(x, y, 5); // í„°ì¹˜í•œ ìë¦¬ì— ë™ê·¸ë¼ë¯¸ ê·¸ë¦¬ê¸°
+                LCD_ShowNum(60, 300, light, 10, color[11], color[0]); // ì¡°ë„ ê°’ ì¶œë ¥               
 	}
 }
