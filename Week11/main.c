@@ -90,11 +90,13 @@ void TIM2_IRQHandler(){
         GPIO_SetBits(GPIOD,GPIO_Pin_2);
         led_1_flag = 0;
     }
+    else GPIO_ResetBits(GPIOD,GPIO_Pin_2);
 
     if (led_2_flag) {
         GPIO_SetBits(GPIOD,GPIO_Pin_3);
         led_2_flag = 0;
     }
+    else GPIO_ResetBits(GPIOD,GPIO_Pin_3);
 
     TIM_ClearITPendingBit(TIM2,TIM_IT_Update);
 }
