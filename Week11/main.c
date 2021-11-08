@@ -11,7 +11,6 @@
 uint16_t led_on;
 uint16_t led_1;
 uint16_t led_2;
-uint16_t count;
 uint16_t flag;
 uint16_t led_1_flag;
 uint16_t led_2_flag;
@@ -43,11 +42,9 @@ void GPIO_Configure(void){
 }
 
 void TIM2_Configure(void){
-    //1초마다 count되도록 설정
     TIM_TimeBaseInitTypeDef TIM_InitStructure;
-    //TIM2 ENABLE
+
     TIM_Cmd(TIM2, ENABLE);
-    //AutoreloadRegister ENABLE
     TIM_ARRPreloadConfig(TIM2, ENABLE);
     
     TIM_InitStructure.TIM_Prescaler = 7200-1;
@@ -58,7 +55,6 @@ void TIM2_Configure(void){
 }
 
 void NVIC_Configure(void){
-    //TIM2 interrrupt
     NVIC_InitTypeDef NVIC_InitStructure;
     
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
@@ -75,57 +71,45 @@ void NVIC_Configure(void){
 }
 
 void TIM2_IRQHandler(){
-    count++;
-    if(flag == 1){
+    if (flag) {
         led_1++;
-        led_1 = led_1 % 2;
         led_2++;
-        led_2 = (led_2 % 5);
-    }
-    if(flag == 0){
-        LCD_ShowString(20,40,"OFF",RED,WHITE);
-    }
-    else if(flag == 1){
-        LCD_ShowString(20,40,"ON ",RED,WHITE);
-        if(led_2 == 4){
-            led_2_flag++;
-            led_2_flag = led_2_flag % 2;
+        LCD_ShowString(60,60,"ON",RED,WHITE);
+        if ((led_1 % 2) == 0) {
+            led_1_flag = 1;
+        }
+        if ((led_2 % 5) == 0) {
+            led_2_flag = 1;
         }
     }
-    
-    if(led_1 == 1){
+    else {
+        LCD_ShowString(60,60,"OFF",RED,WHITE);
+    }
+
+    if (led_1_flag) {
         GPIO_SetBits(GPIOD,GPIO_Pin_2);
-        LCD_ShowString(80,280,"ON ",RED,WHITE);
+        led_1_flag = 0;
     }
-    else if(led_1 == 0){
-        GPIO_ResetBits(GPIOD,GPIO_Pin_2);
-        LCD_ShowString(80,280,"OFF",RED,WHITE);
-    }
-    
-    if(led_2_flag == 1){
+
+    if (led_2_flag) {
         GPIO_SetBits(GPIOD,GPIO_Pin_3);
-        LCD_ShowString(200,280,"ON ",RED,WHITE);
+        led_2_flag = 0;
     }
-    else if(led_2_flag == 0){
-        GPIO_ResetBits(GPIOD,GPIO_Pin_3);
-        LCD_ShowString(200,280,"OFF",RED,WHITE);
-    }
-    
-    
-    LCD_ShowNum(150,220,count,4,RED,WHITE);
-    
+
     TIM_ClearITPendingBit(TIM2,TIM_IT_Update);
 }
 
 //메인문 예시
 int main() {
-    uint16_t recSize = 30;
+    uint16_t rectangle_x1 = 30;
+    uint16_t rectangle_y1 = 120;
+    uint16_t rectangle_x2 = 90;
+    uint16_t rectangle_y2 = 180;
+
     uint16_t x = 0, y = 0;
-    uint16_t pix_x = 0,pix_y = 0;
     led_on = 0;
     led_1 = 0;
     led_2 = 0;
-    count = 0;
     flag = 0;
     led_1_flag = 0;
     led_2_flag = 0;
@@ -143,32 +127,19 @@ int main() {
     Touch_Adjust();
     LCD_Clear(WHITE);
     
-    
+    LCD_ShowString(40,40,"MON_TEAM03",BLUE,WHITE);
+
     while(1){
-        /*TEAM NAME*/
-        LCD_ShowString(20,20,"MON_TEAM03",BLUE,WHITE);
-        
-        /*Button*/
-        LCD_ShowString(40,150,"BUT",RED,WHITE);
-        LCD_DrawRectangle(40-recSize,150-recSize,40+recSize,150+recSize);
+        LCD_ShowString(60,150,"BUT",RED,WHITE);
+        LCD_DrawRectangle(rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2);
         Touch_GetXY(&x,&y,1);
-        Convert_Pos(x,y,&pix_x,&pix_y);
-        if((10<=pix_x && pix_x <= 70) && (120<=pix_y && pix_y<=180))
+        Convert_Pos(x,y,&x,&y);
+        if((rectangle_x1 <= x && x <= rectangle_x2) && (rectangle_y1 <= y && y <= rectangle_y2))
         {
-            
             flag++;
-            flag = flag%2;
-            pix_x = 0;
-            pix_y = 0;
-            x=0;
-            y=0;
-            
+            flag %= 2;
+            x = 0;
+            y = 0;
         }
-        /*COUNT*/
-        LCD_ShowString(20,220,"COUNT",RED,WHITE);
-        
-        /*LED*/
-        LCD_ShowString(10,280,"LED 1 :",RED,WHITE);
-        LCD_ShowString(120,280,"LED 2 :",RED,WHITE);
     }
 }
