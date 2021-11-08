@@ -1,7 +1,6 @@
 C:\Users\juhyeonlee\Desktop\Embedded\Debug\BrowseInfo\user\main.pbi: \
   C:\Users\juhyeonlee\Desktop\Embedded\Libraries\LCD\touch.h \
   C:\Users\juhyeonlee\Desktop\Embedded\Libraries\LCD\lcd.h \
-  C:\Program\ Files\IAR\ Systems\Embedded\ Workbench\ 9.0\arm\CMSIS\Core\Include\core_cm3.h \
   C:\Users\juhyeonlee\Desktop\Embedded\Libraries\CMSIS\DeviceSupport\stm32f10x.h \
   C:\Users\juhyeonlee\Desktop\Embedded\Libraries\STM32F10x_StdPeriph_Driver_v3.5\inc\misc.h \
   C:\Users\juhyeonlee\Desktop\Embedded\Libraries\STM32F10x_StdPeriph_Driver_v3.5\inc\stm32f10x_wwdg.h \
@@ -38,4 +37,5 @@ C:\Users\juhyeonlee\Desktop\Embedded\Debug\BrowseInfo\user\main.pbi: \
   C:\Program\ Files\IAR\ Systems\Embedded\ Workbench\ 9.0\arm\inc\c\yvals.h \
   C:\Program\ Files\IAR\ Systems\Embedded\ Workbench\ 9.0\arm\inc\c\ycheck.h \
   C:\Program\ Files\IAR\ Systems\Embedded\ Workbench\ 9.0\arm\inc\c\stdint.h \
+  C:\Program\ Files\IAR\ Systems\Embedded\ Workbench\ 9.0\arm\CMSIS\Core\Include\core_cm3.h \
   C:\Users\juhyeonlee\Desktop\Embedded\user\main.c
