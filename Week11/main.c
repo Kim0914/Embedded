@@ -74,12 +74,12 @@ void TIM2_IRQHandler(){
     if (flag) {
         led_1++;
         led_2++;
-        LCD_ShowString(60,60,"ON",RED,WHITE);
+        LCD_ShowString(60,60,"ON  ",RED,WHITE);
         if ((led_1 % 2) == 0) {
             led_1_flag = 1;
         }
         if ((led_2 % 5) == 0) {
-            led_2_flag = 1;
+            led_2_flag != led_2_flag;
         }
     }
     else {
@@ -94,14 +94,12 @@ void TIM2_IRQHandler(){
 
     if (led_2_flag) {
         GPIO_SetBits(GPIOD,GPIO_Pin_3);
-        led_2_flag = 0;
     }
     else GPIO_ResetBits(GPIOD,GPIO_Pin_3);
 
     TIM_ClearITPendingBit(TIM2,TIM_IT_Update);
 }
 
-//메인문 예시
 int main() {
     uint16_t rectangle_x1 = 30;
     uint16_t rectangle_y1 = 120;
@@ -115,14 +113,12 @@ int main() {
     flag = 0;
     led_1_flag = 0;
     led_2_flag = 0;
-    // LCD 관련 설정은 LCD_Init에 구현되어 있으므로 여기서 할 필요 없음
+
     SystemInit();
     RCC_Configure();
     GPIO_Configure();
     NVIC_Configure();
     TIM2_Configure();
-    
-    // ------------------------------------
 
     LCD_Init();
     Touch_Configuration();
